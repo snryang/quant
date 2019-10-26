@@ -148,3 +148,34 @@ left.join(right,on='Key') # 等同于 pd.merge(left,right)
 
 pd.get_option('display.max_rows')
 pd.set_option('display.max_rows') #设置默认输出几条数据
+
+### pivot操作
+example.pivot(index='Category',columns='Month',values='Amount')
+
+df.pivot_table(index = 'Sex',columns='Pclass',values='Fare') #默认平均值
+df.pivot_table(index = 'Sex',columns='Pclass',values='Fare',aggfunc='max')
+
+### 时间操作
+ts = pd.Timestamp('2017-11-24')
+ts + pd.Timedelta('5 days') # ts加上5天
+
+s = pd.Series(['2017-11-24 00:00:00','2017-11-25 00:00:00','2017-11-26 00:00:00'])
+ts = pd.to_datetime(s)
+ts.dt.hour #获取Series中的小时
+ts.dt.weekday #获取Series中的星期
+
+
+pd.date_range(start='2020-10-01',periods = 10,freq='12H') #从start开始，间隔12小时生成一个，一共10个数据
+data['Time'] = pd.to_datetime(data['Time']) #将time列转为时间类型
+data[pd.Timestamp('2012-01-01 09:00'):pd.Timestamp('2012-01-01 19:00')] #取时间范围内的数据
+data[('2012-01-01 09:00'):('2012-01-01 19:00')] #同上一句代码
+
+data['2013'] #取2013年的数据
+data['2012-01':'2012-03'] #取2012年 1-3月的数据
+data[data.index.month ==1] #取1月份的数据
+data[(data.index.hour > 8) & (data.index.hour < 12)] #取8点到12点的数据
+data.between_time('08:00','12:00') #同上
+
+data.resample('D').mean().head() #重采样，按日期，同一天的多条数据合为一条，取其平均值
+data.resample('3D').mean().head() #重采样，3天的汇为一条数据
+data.resample('M').mean().head() #重采样，按月
