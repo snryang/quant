@@ -1,4 +1,4 @@
-# 本代码由可视化策略环境自动生成 2019年11月13日 21:36
+# 本代码由可视化策略环境自动生成 2019年11月13日 21:37
 # 本代码单元只能在可视化模式下编辑。您也可以拷贝代码，粘贴到新建的代码单元或者策略，然后修改。
 
 
@@ -47,14 +47,14 @@ def m4_handle_data_bigquant_run(context, data):
                 cash_for_sell += position.amount * stock_market_price
                 continue            
 
-            # 止盈 赚20% 且为可交易状态
+            # 止盈 赚15% 且为可交易状态
             if stock_market_price/stock_cost-1 >= 0.15  and data.can_trade(symbol) and not context.has_unfinished_sell_order(equities[sid]):
                 context.order_target_percent(symbol,0)
                 current_stopwin_stock.append(sid)
                 cash_for_sell += position.amount * stock_market_price
                 continue
 
-            # 止损 亏5% 且为可交易状态
+            # 止损 亏8% 且为可交易状态
             if stock_market_price/stock_cost-1 <= -0.08 and data.can_trade(symbol) and not context.has_unfinished_sell_order(equities[sid]):   
                 context.order_target_percent(symbol,0)     
                 current_stoploss_stock.append(sid)
@@ -70,9 +70,10 @@ def m4_handle_data_bigquant_run(context, data):
     if len(current_stoploss_stock)>0:
         print(today_date,'止损股票列表',current_stoploss_stock)
 
-    cash_for_buy = context.portfolio.cash + cash_for_sell -100 #买入股票 可用现金    
+    cash_for_buy = context.portfolio.cash + cash_for_sell  #买入股票 可用现金    
     #单只股标最大仓位金额
     max_cash_per_instrument = context.portfolio.portfolio_value * context.max_cash_per_instrument
+
 
     # 按日期过滤得到今日的预测数据
     ranker_prediction = context.ranker_prediction[context.ranker_prediction.date == today_date]
@@ -81,31 +82,26 @@ def m4_handle_data_bigquant_run(context, data):
     
     for index, row in ranker_prediction.iterrows():
         instrument = row['instrument']
+        if len(current_stock) + len(current_buy_stock) > 5:
+            break
         if instrument in current_stock:
             continue
         if instrument in current_stoploss_stock:
             continue
         if not data.can_trade(context.symbol(instrument)):
             continue
-        # 评分太低，当天不买
-        #if row['score']<1:
-        #    break
        
-
-        cash = max_cash_per_instrument
-        breakFlag = False
-        if(cash_for_buy < cash):
-            cash = cash_for_buy
-            breakFlag = True
+        cash = min(max_cash_per_instrument,cash_for_buy)
         price = data.current(context.symbol(instrument), 'price')  # 最新价格
         stock_num = np.floor(cash/price/100)*100  # 向下取整
         context.order(context.symbol(instrument), stock_num) # 整百下单
         cash_for_buy = cash_for_buy - stock_num * price       
         current_buy_stock.append(instrument)
-        if(breakFlag):
+        if cash_for_buy < 10000:
             break
     if len(current_buy_stock)>0:
         print(today_date,'买入股票',current_buy_stock)
+        
 # 回测引擎：准备数据，只执行一次
 def m4_prepare_bigquant_run(context):
     #在数据准备函数中一次性计算每日的大盘风控条件相比于在handle中每日计算风控条件可以提高回测速度
