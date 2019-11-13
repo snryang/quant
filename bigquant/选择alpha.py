@@ -42,3 +42,13 @@ Alpha_16=-1*sum(rank(correlation(rank(high_0),rank(volume_0),3)),3)
 Alpha_17=-1*rank(covariance(rank(high_0),rank(volume_0),5))
 Alpha_27=-1*ts_max(correlation(ts_rank(volume_0,5),ts_rank(high_0,5),5),3)
 Alpha_45=(-1*correlation(high_0,rank(volume_0),5))
+
+
+#2019-11-13 第三次选择
+Alpha_9=(-1*rank(((sum(open_0,5)*sum(close_0/shift(close_0,1)-1,5))-delay((sum(open_0,5)*sum(close_0/shift(close_0,1)-1,5)),10))))
+Alpha_57=0-1*(1*(rank((sum(close_0/shift(close_0,1)-1,10)/sum(sum(close_0/shift(close_0,1)-1,2),3)))*rank(((close_0/shift(close_0,1)-1)*market_cap_0))))
+Alpha_30=min(product(rank(rank(scale(log(sum(ts_min(rank(rank((-1*rank(delta((close_0-1),5))))),2),1))))),1),5)+ts_rank(delay((-1*shift(close_0,1)/close_0-1),6),5)
+
+Alpha_14=-1*rank(covariance(rank(close_0),rank(volume_0),5))
+Alpha_4=-1*correlation(rank(open_0),rank(volume_0),10)
+Alpha_45=(-1*correlation(high_0,rank(volume_0),5))
