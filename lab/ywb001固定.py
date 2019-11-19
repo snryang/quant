@@ -1,4 +1,4 @@
-# 本代码由可视化策略环境自动生成 2019年11月17日 09:48
+# 本代码由可视化策略环境自动生成 2019年11月19日 21:10
 # 本代码单元只能在可视化模式下编辑。您也可以拷贝代码，粘贴到新建的代码单元或者策略，然后修改。
 
 
@@ -67,10 +67,10 @@ def m12_handle_data_bigquant_run(context, data):
         print(today_date,'止损股票列表',current_stoploss_stock)
 
     cash_for_buy = context.portfolio.cash  #买入股票 可用现金    
-    cash_for_buy_max = context.portfolio.portfolio_value * 0.33 #每天最多买33%仓位
+    cash_for_buy_max = context.portfolio.portfolio_value * (1/3) #每天最多买33%仓位
     cash_for_buy = min(cash_for_buy,cash_for_buy_max)
     #单只股标最大仓位金额
-    max_cash_per_instrument = context.portfolio.portfolio_value * 0.15 #每只股票最多占用15%仓位    
+    max_cash_per_instrument = context.portfolio.portfolio_value * (1/6) #每只股票最多占用15%仓位    
 
     # 按日期过滤得到今日的预测数据
     ranker_prediction = context.ranker_prediction[context.ranker_prediction.date == today_date]
@@ -88,6 +88,8 @@ def m12_handle_data_bigquant_run(context, data):
         if not data.can_trade(context.symbol(instrument)):
             continue        
         score = row['score']
+        # if score< 2.0:
+        #     break
         cash = min(max_cash_per_instrument,cash_for_buy)        
         price = data.current(context.symbol(instrument), 'price')  # 最新价格        
         stock_num = np.floor(cash/price/100)*100  # 向下取整
@@ -319,7 +321,7 @@ m12 = M.trade.v4(
     volume_limit=0.025,
     order_price_field_buy='open',
     order_price_field_sell='close',
-    capital_base=100000,
+    capital_base=50000,
     auto_cancel_non_tradable_orders=True,
     data_frequency='daily',
     price_type='真实价格',
