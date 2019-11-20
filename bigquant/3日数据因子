@@ -1,0 +1,37 @@
+Alpha_12=(rank(ts_max((amount_0/volume_0*adjust_factor_0-close_0),3))+rank(ts_min((amount_0/volume_0*adjust_factor_0-close_0),3)))*rank(delta(volume_0,3))
+Alpha_16=-1*sum(rank(correlation(rank(high_0),rank(volume_0),3)),3)
+a1=-1*sum(rank(correlation(rank(close_0),rank(volume_0),3)),3)
+a2=-1*sum(rank(correlation(rank(low_0),rank(volume_0),3)),3)
+a3=-1*sum(rank(correlation(rank(open_0),rank(volume_0),3)),3)
+a4==(-1*ts_max(rank(correlation(rank(volume_0),rank(amount_0/volume_0*adjust_factor_0),3)),3))
+
+
+
+
+# #号开始的表示注释
+# 多个特征，每行一个，可以包含基础特征和衍生特征
+
+avg_turn_10
+amount_0/avg_amount_10
+mean(high_0-low_0,10)/mean(close_0-open_0,10)
+return_10
+rank_avg_amount_0/rank_avg_amount_10
+amount_0/mean(amount_0, 10)*100
+(-1*correlation(close_0,amount_0,10))
+std(amount_0,10)/mean(amount_0, 10)
+rank_return_10
+(ts_max(high_0,10)- ts_min(low_0,10))/mean(close_0,10)
+(ts_max(amount_0,10)- ts_min(amount_0,10))/mean(amount_0,10)
+std(return_0,10)
+std(high_0-low_0,10)/mean(high_0-low_0,10)
+mean(volume_0,10)/mean(deal_number_0,10)
+volume_0/deal_number_0
+mean(volume_0,5)/mean(deal_number_0,5)
+rank_avg_amount_10
+rank_avg_amount_0
+ts_argmax(high_0, 10)-ts_argmin(low_0, 10)
+ts_argmax(close_0, 10)-ts_argmin(close_0, 10)
+ts_rank(ts_argmax(close_0, 10), 10)
+ts_rank(ts_argmin(close_0, 10), 10)
+ts_rank(ts_argmax(high_0, 10), 10)
+ts_rank(ts_argmin(low_0, 10), 10)

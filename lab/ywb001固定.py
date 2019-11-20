@@ -1,9 +1,9 @@
-# 本代码由可视化策略环境自动生成 2019年11月19日 21:10
+# 本代码由可视化策略环境自动生成 2019年11月19日 21:13
 # 本代码单元只能在可视化模式下编辑。您也可以拷贝代码，粘贴到新建的代码单元或者策略，然后修改。
 
 
 # 回测引擎：初始化函数，只执行一次
-def m12_initialize_bigquant_run(context):
+def m4_initialize_bigquant_run(context):
     # 加载预测数据
     context.ranker_prediction = context.options['data'].read_df()
 
@@ -18,10 +18,10 @@ def m12_initialize_bigquant_run(context):
     context.stock_weights = [1 / stock_count for i in range(0, stock_count)]
     # 设置每只股票占用的最大资金比例
     context.max_cash_per_instrument = 0.2
-    context.options['hold_days'] = 3
+    context.options['hold_days'] = 5
 
 # 回测引擎：每日数据处理函数，每天执行一次
-def m12_handle_data_bigquant_run(context, data):
+def m4_handle_data_bigquant_run(context, data):
     #获取当日日期
     today = data.current_dt
     today_date = data.current_dt.strftime('%Y-%m-%d')
@@ -104,7 +104,7 @@ def m12_handle_data_bigquant_run(context, data):
         print(today_date,'买入股票',current_buy_stock)
         print(today_date,'股票得分',current_buy_stock_score)
 # 回测引擎：准备数据，只执行一次
-def m12_prepare_bigquant_run(context):
+def m4_prepare_bigquant_run(context):
     #在数据准备函数中一次性计算每日的大盘风控条件相比于在handle中每日计算风控条件可以提高回测速度
     # 多取50天的数据便于计算均值(保证回测的第一天均值不为Nan值)，其中context.start_date和context.end_date是回测指定的起始时间和终止时间
     start_date= (pd.to_datetime(context.start_date) - datetime.timedelta(days=50)).strftime('%Y-%m-%d')     
@@ -191,7 +191,7 @@ m15 = M.general_feature_extractor.v7(
     features=m3.data,
     start_date='',
     end_date='',
-    before_start_days=30
+    before_start_days=40
 )
 
 m16 = M.derived_feature_extractor.v3(
@@ -215,10 +215,10 @@ m13 = M.dropnan.v1(
     input_data=m7.data
 )
 
-m5 = M.chinaa_stock_filter.v1(
+m12 = M.chinaa_stock_filter.v1(
     input_data=m13.data,
     index_constituent_cond=['全部'],
-    board_cond=[],
+    board_cond=['全部'],
     industry_cond=['全部'],
     st_cond=['正常'],
     output_left_data=False
@@ -237,7 +237,7 @@ m17 = M.general_feature_extractor.v7(
     features=m3.data,
     start_date='',
     end_date='',
-    before_start_days=30
+    before_start_days=40
 )
 
 m18 = M.derived_feature_extractor.v3(
@@ -253,16 +253,16 @@ m14 = M.dropnan.v1(
     input_data=m18.data
 )
 
-m10 = M.chinaa_stock_filter.v1(
+m20 = M.chinaa_stock_filter.v1(
     input_data=m14.data,
     index_constituent_cond=['全部'],
-    board_cond=[],
+    board_cond=['全部'],
     industry_cond=['全部'],
     st_cond=['正常'],
     output_left_data=False
 )
 
-m11 = M.input_features.v1(
+m5 = M.input_features.v1(
     features="""#价格类
 Alpha_6
 Alpha_9
@@ -292,8 +292,8 @@ Alpha_83"""
 )
 
 m6 = M.stock_ranker_train.v5(
-    training_ds=m5.data,
-    features=m11.data,
+    training_ds=m12.data,
+    features=m5.data,
     learning_algorithm='排序',
     number_of_leaves=105,
     minimum_docs_per_leaf=2400,
@@ -306,22 +306,22 @@ m6 = M.stock_ranker_train.v5(
 
 m8 = M.stock_ranker_predict.v5(
     model=m6.model,
-    data=m10.data,
+    data=m20.data,
     m_lazy_run=False
 )
 
-m12 = M.trade.v4(
+m4 = M.trade.v4(
     instruments=m9.data,
     options_data=m8.predictions,
     start_date='',
     end_date='',
-    initialize=m12_initialize_bigquant_run,
-    handle_data=m12_handle_data_bigquant_run,
-    prepare=m12_prepare_bigquant_run,
+    initialize=m4_initialize_bigquant_run,
+    handle_data=m4_handle_data_bigquant_run,
+    prepare=m4_prepare_bigquant_run,
     volume_limit=0.025,
     order_price_field_buy='open',
     order_price_field_sell='close',
-    capital_base=50000,
+    capital_base=1000000,
     auto_cancel_non_tradable_orders=True,
     data_frequency='daily',
     price_type='真实价格',

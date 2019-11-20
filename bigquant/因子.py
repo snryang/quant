@@ -26,6 +26,21 @@ Alpha_51=(-1*ts_max(rank(correlation(rank(volume_0),rank(amount_0/volume_0*adjus
 Alpha_83=(rank(delay(((high_0-low_0)/(sum(close_0,5)/5)),2))*rank(rank(volume_0)))/(((high_0-low_0)/(sum(close_0,5)/5))/(amount_0/volume_0*adjust_factor_0-close_0))
 Alpha_48=(((rank((1/close_0))*volume_0)/mean(amount_0,20))*((high_0*rank((high_0-close_0)))/(sum(high_0,5) /5)))-rank((amount_0/volume_0*adjust_factor_0-delay(amount_0/volume_0*adjust_factor_0,5)))
 
+# 待选择2019-1119
+Alpha_21=((-1*rank((open_0-delay(high_0,1))))*rank((open_0-delay(close_0,1))))*rank((open_0-delay(low_0,1)))
+Alpha_2=rank(ts_argmax(signedpower(where(close_0/shift(close_0,1)-1<0,std(close_0/shift(close_0,1)-1<0,20),close_0),2),5))-0.5
+Alpha_5=-1*ts_rank(rank(low_0),9)
+Alpha_7=-1*correlation(open_0,volume_0,10)
+Alpha_18=((-1*rank(ts_rank(close_0,10)))*rank(delta(delta(close_0,1),1)))*rank(ts_rank((volume_0/mean(amount_0,20)),5))
+Alpha_19=-1*rank(((std(abs((close_0-open_0)),5)+(close_0-open_0))+correlation(close_0,open_0,10)))
+Alpha_23=-1*(delta(correlation(high_0,volume_0,5),5)*rank(std(close_0,20)))
+Alpha_26=rank(-1*(close_0/shift(close_0,1)-1)*mean(amount_0,20)*amount_0/volume_0*adjust_factor_0*(high_0-close_0))
+Alpha_29=scale(correlation(mean(amount_0,20),low_0,5)+(high_0+low_0)*0.5-close_0)
+Alpha_31=((1.0-rank(((sign((close_0-delay(close_0,1)))+sign((delay(close_0,1)-delay(close_0,2))))+sign((delay(close_0,2)-delay(close_0,3))))))*sum(volume_0,5))/sum(volume_0,20)
+Alpha_32=(rank(rank(rank(decay_linear((-1*rank(rank(delta(close_0,10)))),10))))+rank((-1*delta(close_0,3))))+sign(scale(correlation(mean(amount_0,20),low_0,12)))
+Alpha_41=((-1*rank(std(high_0,10)))*correlation(high_0,volume_0,10))
+
+
 #待选择 20内因子 中期
 Alpha_31=((1.0-rank(((sign((close_0-delay(close_0,1)))+sign((delay(close_0,1)-delay(close_0,2))))+sign((delay(close_0,2)-delay(close_0,3))))))*sum(volume_0,5))/sum(volume_0,20)
 Alpha_32=(rank(rank(rank(decay_linear((-1*rank(rank(delta(close_0,10)))),10))))+rank((-1*delta(close_0,3))))+sign(scale(correlation(mean(amount_0,20),low_0,12)))

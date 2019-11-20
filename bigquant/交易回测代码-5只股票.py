@@ -16,6 +16,9 @@ def m4_handle_data_bigquant_run(context, data):
             symbol = context.symbol(sid)            
             position = equities[sid]
             stock_market_price=data.current(symbol,'price')  #当前市场价
+            stock_market_high=data.current(symbol,'high')  #当前最高价
+            stock_market_close=data.current(symbol,'close')  #当前收盘价
+
             stock_cost=position.cost_basis  #持仓成本价
 
             # 固定天数卖出

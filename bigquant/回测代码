@@ -1,0 +1,65 @@
+# 回测引擎：每日数据处理函数，每天执行一次
+def bigquant_run(context, data):
+    # 按日期过滤得到今日的预测数据
+    ranker_prediction = context.ranker_prediction[
+    context.ranker_prediction.date == data.current_dt.strftime('%Y-%m-%d')]
+
+    # 1. 资金分配
+    # 平均持仓时间是hold_days，每日都将买入股票，每日预期使用 1/hold_days 的资金
+    # 实际操作中，会存在一定的买入误差，所以在前hold_days天，等量使用资金；之后，尽量使用剩余资金（这里设置最多用等量的1.5倍）
+    is_staging = context.trading_day_index < context.options['hold_days'] # 是否在建仓期间（前 hold_days 天）
+    cash_avg = context.portfolio.portfolio_value / context.options['hold_days']
+    cash_for_buy = min(context.portfolio.cash, (1 if is_staging else 1.5) * cash_avg)
+    cash_for_sell = cash_avg - (context.portfolio.cash - cash_for_buy)
+    positions = {e.symbol: p.amount * p.last_sale_price
+                 for e, p in context.perf_tracker.position_tracker.positions.items()}
+    #print(context.perf_tracker.position_tracker.positions.items())
+
+    # 2. 生成卖出订单：hold_days天之后才开始卖出；对持仓的股票，按StockRanker预测的排序末位淘汰
+    if True:
+        equities = {e.symbol: e for e, p in context.perf_tracker.position_tracker.positions.items()}
+        #instruments = list(reversed(list(ranker_prediction.instrument[ranker_prediction.instrument.apply(
+                #lambda x: x in equities and not context.has_unfinished_sell_order(equities[x]))])))
+        instruments_pre = list(ranker_prediction.instrument[ranker_prediction.instrument.apply(
+                lambda x: x in equities )])
+        position_prediction = ranker_prediction[ranker_prediction.instrument.isin(instruments_pre)]
+        instruments = list(position_prediction.instrument[position_prediction.score <1.3])
+        #instruments = list(position_prediction.instrument[position_prediction.score < 0.2])
+        #print(instruments)
+        #print(instruments12,list(ranker_prediction.date)[0])
+        #print(context.has_unfinished_sell_order)
+        # print('rank order for sell %s' % instruments)
+        for instrument in instruments:
+            context.order_target(context.symbol(instrument), 0)
+            cash_for_sell -= positions[instrument]
+            if cash_for_sell <= 0:
+                break
+
+    # 3. 生成买入订单：按StockRanker预测的排序，买入前面的stock_count只股票
+    #buy_cash_weights = context.stock_weights
+    rank_buy = ranker_prediction[ranker_prediction.score>2.1]
+    #rank_buy = ranker_prediction[ranker_prediction.score>1.12]
+    buy_instruments_pre = list(rank_buy.instrument)
+    #print(list(ranker_prediction.date)[0],ranker_prediction.score)
+    #buy_instruments1 = list(ranker_prediction.instrument[ranker_prediction.score>1.16])
+    buy_scores_pre = list(rank_buy.score)
+    buy_instruments = buy_instruments_pre[:np.where(len(buy_instruments1)>4,4,len(buy_instruments1))]
+    buy_scores = buy_scores_pre[:len(buy_instruments)]
+    buy_cash_weights = buy_scores/np.sum(buy_scores)
+    #buy_cash_weights = T.norm([1/math.log(i+2) for i in range(0,len(buy_instruments))])
+    max_cash_per_instrument = context.portfolio.portfolio_value * context.max_cash_per_instrument
+    if any(buy_instruments):
+        for i, instrument in enumerate(buy_instruments):
+            cash = cash_for_buy * buy_cash_weights[i]
+            if cash > max_cash_per_instrument - positions.get(instrument, 0):
+            # 确保股票持仓量不会超过每次股票最大的占用资金量
+                cash = max_cash_per_instrument - positions.get(instrument, 0)
+            today_price = data.current(symbol(instrument), ['amount', 'volume'])
+            buy_price =today_price['amount'] / today_price['volume']
+            buy_amount = int(round(cash/(buy_price*100)))
+            #print(buy_amount)
+        #context.order_lots(symbol(instrument),1)
+            if buy_amount > 0: 
+                context.order_lots(symbol(instrument),buy_amount)
+       # if cash > 0:
+         #   context.order_value(context.symbol(instrument), cash)
