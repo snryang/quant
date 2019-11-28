@@ -36,8 +36,6 @@ y19=ta_bbands_upperband_14_0/ta_bbands_lowerband_14_0
 
 
 kdj=abs(ta_stoch_slowk_5_3_0_3_0_0-ta_stoch_slowd_5_3_0_3_0_0)
-
-
 rsi6=ta_rsi(close_0, 6)
 rsi6_5=ta_rsi(close_0, 6)/min(ta_rsi(close_1, 6),ta_rsi(close_2, 6),ta_rsi(close_3, 6),ta_rsi(close_3, 6))
 
